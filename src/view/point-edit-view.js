@@ -43,7 +43,7 @@ function createPointOffersTemplate(pointOffers) {
 }
 
 function createEditPointTemplate({ point, pointDestination, pointOffers }) {
-  const { basePrice, dateFrom, dateTo, offers, type } = point;
+  const { basePrice, dateFrom, dateTo, type } = point;
 
   return (
     `<li class="trip-events__item">
