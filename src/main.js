@@ -21,4 +21,4 @@ const tripPresenter = new TripPresenter({ tripContainer: eventListElement, desti
 render(new TripInfoView(), tripInfoElement, RenderPosition.AFTERBEGIN);
 render(new FilterView(), tripInfoElement.querySelector('.trip-controls__filters'));
 
-tripPresenter.init();
+tripPresenter.init(); //I forgot to make a branch before, I commited in master :(
