@@ -10,6 +10,10 @@ export default class OffersModel {
     return this.offers;
   }
 
+  getByType(type) {
+    return this.offers.find((offer) => offer.type === type);
+  }
+
   getRandomOffer() {
     return getRandomArrayElement(this.offers);
   }

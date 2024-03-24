@@ -1,14 +1,16 @@
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 import { humanizeDate, getPointDuration } from '../utils.js';
 
 function createPointOffersTemplate(offers) {
+  const offersList = offers.offers.reduce((acc, { title, price }) =>
+    acc.concat(`<li class="event__offer">
+        <span class="event__offer-title">${title}</span>
+        &plus;&euro;&nbsp;
+        <span class="event__offer-price">${price}</span>
+    </li>`), '');
   return (
     `<ul class="event__selected-offers">
-        ${offers.offers.map((title, price) => `<li class="event__offer">
-          <span class="event__offer-title">${title}</span>
-            &plus;&euro;&nbsp;
-          <span class="event__offer-price">${price}</span>
-          </li>`).join('')}
+        ${offersList}
       </ul>`
   );
 }
@@ -29,7 +31,7 @@ function createPointTemplate(point) {
         &mdash;
         <time class="event__end-time" datetime=${humanizeDate('DD/MM/YY HH:mm', dateTo)}>${humanizeDate('HH:mm', dateTo)}</time>
       </p>
-      <p class="event__duration">${getPointDuration(point)}}</p>
+      <p class="event__duration">${getPointDuration(point)}</p>
     </div>
     <p class="event__price">
       &euro;&nbsp;<span class="event__price-value">${basePrice}</span>
@@ -50,24 +52,27 @@ function createPointTemplate(point) {
 </li>`;
 }
 
-export default class PointView {
-  getTemplate() {
-    return createPointTemplate(this.point);
+export default class PointView extends AbstractView {
+  #point = null;
+  #destination = null;
+  #offers = null;
+  #onEditClick = null;
+
+  get template() {
+    return createPointTemplate(this.#point);
   }
 
-  constructor({ point }) {
-    this.point = point;
+  constructor({ point, destination, offers, onEditClick }) {
+    super();
+    this.#point = point;
+    this.#destination = destination;
+    this.#offers = offers;
+    this.#onEditClick = onEditClick;
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#editClickHandler);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
-  }
+  #editClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#onEditClick();
+  };
 }

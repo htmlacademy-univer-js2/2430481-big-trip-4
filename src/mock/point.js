@@ -12,7 +12,7 @@ function generatePoint() {
     basePrice: getRandomInteger(Price.MIN, Price.MAX),
     dateFrom: getDate({ next: false }),
     dateTo: getDate({ next: true }),
-    destination: generateDestination,
+    destination: generateDestination(),
     isFavorite: Boolean(getRandomInteger(0, 1)),
     offers: Array.from({ length: offerCount }, () => generateOffer()),
     type: getRandomArrayElement(TYPES)
