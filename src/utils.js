@@ -22,7 +22,7 @@ const Duration = {
 
 
 function getDate({ next }) {
-  let date = dayjs().subtract(getRandomInteger(0, Duration.DAY), 'day').toDate();
+  let date = dayjs().add(getRandomInteger(0, Duration.DAY), 'day').toDate();
   const minsGap = getRandomInteger(0, Duration.MIN);
   const hoursGap = getRandomInteger(1, Duration.HOUR);
   const daysGap = getRandomInteger(0, Duration.DAY);
@@ -73,10 +73,38 @@ function getPointDuration(point) {
   return pointDuration;
 }
 
+function getTripTitle(cities) {
+  return cities.reduce((acc, city, index) => {
+    if (index !== cities.length - 1) {
+      acc += `${city} &mdash; `;
+    } else {
+      acc += `${city}`;
+    }
+    return acc;
+  }, '');
+}
+
+function getTripStartDate(sortedPoints) {
+  return dayjs(sortedPoints[0].dateFrom).format('MMM DD');
+}
+
+function getTripEndDate(sortedPoints) {
+  const startDate = sortedPoints[0].dateFrom;
+  const endDate = sortedPoints[sortedPoints.length - 1].dateTo;
+  if (dayjs(startDate).format('MMM') === dayjs(endDate).format('MMM')) {
+    return dayjs(endDate).format('DD');
+  } else {
+    return dayjs(endDate).format('MMM DD');
+  }
+}
+
 export {
   getRandomArrayElement,
   getRandomInteger,
   humanizeDate,
   getPointDuration,
-  getDate
+  getDate,
+  getTripTitle,
+  getTripStartDate,
+  getTripEndDate
 };
