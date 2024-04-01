@@ -10,7 +10,7 @@ function generatePoint() {
   return {
     id: crypto.randomUUID(),
     basePrice: getRandomInteger(Price.MIN, Price.MAX),
-    dateFrom: getDate({ next: false }),
+    dateFrom: getDate({ next: true }),
     dateTo: getDate({ next: true }),
     destination: generateDestination(),
     isFavorite: Boolean(getRandomInteger(0, 1)),
