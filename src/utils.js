@@ -98,6 +98,10 @@ function getTripEndDate(sortedPoints) {
   }
 }
 
+function updateItems(items, update) {
+  return items.map((item) => item.id === update.id ? update : item);
+}
+
 export {
   getRandomArrayElement,
   getRandomInteger,
@@ -106,5 +110,6 @@ export {
   getDate,
   getTripTitle,
   getTripStartDate,
-  getTripEndDate
+  getTripEndDate,
+  updateItems
 };

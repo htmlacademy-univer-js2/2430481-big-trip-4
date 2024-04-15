@@ -31,4 +31,11 @@ const OFFERS = [
   'Travel by train'
 ];
 
-export { CITIES, TYPES, DESCRIPTION, Price, OFFERS, POINT_EMPTY, Quantities };
+
+const MODE = {
+  DEFAULT: 'DEFAULT',
+  EDITING: 'EDITING',
+};
+
+
+export { CITIES, TYPES, DESCRIPTION, Price, OFFERS, POINT_EMPTY, Quantities, MODE };
