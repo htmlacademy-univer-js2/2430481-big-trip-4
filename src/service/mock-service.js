@@ -1,9 +1,8 @@
 import { generateDestination } from '../mock/destination.js';
 import { generateOffer } from '../mock/offer.js';
 import { generatePoint } from '../mock/point.js';
-
 import { getRandomArrayElement, getRandomInteger } from '../utils.js';
-import { TYPES, Quantities } from '../const.js';
+import { TYPES, QUANTITIES } from '../const.js';
 
 export default class MockService {
   destinations = [];
@@ -30,7 +29,7 @@ export default class MockService {
 
   generateDestinations() {
     return Array.from(
-      { length: Quantities.destinationsCount },
+      { length: QUANTITIES.destinationsCount },
       () => generateDestination()
     );
   }
@@ -38,7 +37,7 @@ export default class MockService {
   generateOffers() {
     return TYPES.map((type) => ({
       type,
-      offers: Array.from({ length: getRandomInteger(0, Quantities.offersCount) }, () => generateOffer(type))
+      offers: Array.from({ length: getRandomInteger(0, QUANTITIES.offersCount) }, () => generateOffer(type))
     }));
   }
 
@@ -52,7 +51,7 @@ export default class MockService {
 
       const offerIds = (hasOffers)
         ? offersByType.offers
-          .slice(0, getRandomInteger(0, Quantities.offersCount))
+          .slice(0, getRandomInteger(0, QUANTITIES.offersCount))
           .map((offer) => offer.id)
         : [];
 

@@ -51,6 +51,11 @@ export default class PointPresenter {
     remove(prevEditPointComponent);
   }
 
+  destroy = () => {
+    remove(this.#pointComponent);
+    remove(this.#editPointComponent);
+  };
+
   resetView = () => {
     if (this.#mode !== MODE.DEFAULT) {
       this.#replaceFormToPoint();
