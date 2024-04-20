@@ -1,5 +1,5 @@
 import { getRandomInteger, getRandomArrayElement } from '../utils.js';
-import { OFFERS, Price } from '../const.js';
+import { OFFERS, PRICE } from '../const.js';
 
 function generateOffer() {
   const offer = getRandomArrayElement(OFFERS);
@@ -7,7 +7,7 @@ function generateOffer() {
   return {
     id: crypto.randomUUID(),
     title: offer,
-    price: getRandomInteger(Price.MIN, (Price.MAX / 10))
+    price: getRandomInteger(PRICE.MIN, (PRICE.MAX / 10))
   };
 }
 

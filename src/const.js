@@ -1,13 +1,13 @@
 const CITIES = ['Amsterdam', 'Paris', 'London', 'Stockholm', 'Warsaw', 'Berlin', 'Athens'];
-const TYPES = ['taxi', 'flight', 'bus', 'train', 'ship', 'drive', 'check-in', 'sightseeing', 'restaurant'];
+const POINT_TYPES = ['taxi', 'flight', 'bus', 'train', 'ship', 'drive', 'check-in', 'sightseeing', 'restaurant'];
 const DESCRIPTION = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras aliquet varius magna, non porta ligula feugiat eget. Fusce tristique felis at fermentum pharetra. Aliquam id orci ut lectus varius viverra.';
 
-const Price = {
+const PRICE = {
   MIN: 1,
   MAX: 1000
 };
 
-const Quantities = {
+const QUANTITIES = {
   offersCount: 5,
   destinationsCount: 5,
   pointsCount: 5
@@ -31,11 +31,17 @@ const OFFERS = [
   'Travel by train'
 ];
 
-
 const MODE = {
   DEFAULT: 'DEFAULT',
   EDITING: 'EDITING',
 };
 
+const SORT_TYPE = {
+  DAY: 'day',
+  EVENT: 'event',
+  TIME: 'time',
+  PRICE: 'price',
+  OFFERS: 'offers'
+};
 
-export { CITIES, TYPES, DESCRIPTION, Price, OFFERS, POINT_EMPTY, Quantities, MODE };
+export { CITIES, POINT_TYPES as TYPES, DESCRIPTION, PRICE, OFFERS, POINT_EMPTY, QUANTITIES, MODE, SORT_TYPE };

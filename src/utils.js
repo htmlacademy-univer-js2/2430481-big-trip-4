@@ -21,20 +21,19 @@ const Duration = {
 };
 
 
-function getDate({ next }) {
-  let date = dayjs().add(getRandomInteger(0, Duration.DAY), 'day').toDate();
+function getRandomDate() {
+  return dayjs().add(getRandomInteger(0, Duration.DAY), 'day').toDate();
+}
+
+function addRandomTimespan(date) {
   const minsGap = getRandomInteger(0, Duration.MIN);
   const hoursGap = getRandomInteger(1, Duration.HOUR);
   const daysGap = getRandomInteger(0, Duration.DAY);
-
-  if (next) {
-    date = dayjs(date)
-      .add(minsGap, 'minute')
-      .add(hoursGap, 'hour')
-      .add(daysGap, 'day')
-      .toDate();
-  }
-
+  date = dayjs(date)
+    .add(minsGap, 'minute')
+    .add(hoursGap, 'hour')
+    .add(daysGap, 'day')
+    .toDate();
   return date;
 }
 
@@ -102,14 +101,32 @@ function updateItems(items, update) {
   return items.map((item) => item.id === update.id ? update : item);
 }
 
+function sortByTime(points) {
+  return points.sort((firstPoint, secondPoint) =>
+    dayjs(firstPoint.date.startTime).diff(dayjs(firstPoint.date.endTime), 'minutes') -
+    dayjs(secondPoint.date.startTime).diff(dayjs(secondPoint.date.endTime), 'minutes'));
+}
+
+function sortByPrice(points) {
+  return points.sort((firstPoint, secondPoint) => secondPoint.price - firstPoint.price);
+}
+
+function sortByDay(points) {
+  return points.sort((firstPoint, secondPoint) => new Date(firstPoint.dateFrom) - new Date(secondPoint.dateFrom));
+}
+
 export {
   getRandomArrayElement,
   getRandomInteger,
   humanizeDate,
   getPointDuration,
-  getDate,
+  getRandomDate,
+  addRandomTimespan,
   getTripTitle,
   getTripStartDate,
   getTripEndDate,
-  updateItems
+  updateItems,
+  sortByDay,
+  sortByPrice,
+  sortByTime
 };
