@@ -2,12 +2,12 @@ import AbstractView from '../framework/view/abstract-view.js';
 import { humanizeDate, getPointDuration } from '../utils.js';
 
 function createPointOffersTemplate(offers) {
-  const offersList = offers.offers.reduce((acc, { title, price }) =>
-    acc.concat(`<li class="event__offer">
+  const offersList = offers.offers.reduce((acc, { title, price, isChecked }) => (acc += isChecked ?
+    `<li class="event__offer">
         <span class="event__offer-title">${title}</span>
         &plus;&euro;&nbsp;
         <span class="event__offer-price">${price}</span>
-    </li>`), '');
+    </li>` : ''), '');
   return (
     `<ul class="event__selected-offers">
         ${offersList}
@@ -16,7 +16,7 @@ function createPointOffersTemplate(offers) {
 }
 
 function createPointTemplate(point) {
-  const { basePrice, dateFrom, dateTo, destination, isFavorite, offers, type } = point;
+  const { basePrice, dateFrom, dateTo, destination, isFavorite, type, offers } = point;
   const favoriteClass = isFavorite ? 'event__favorite-btn--active' : '';
   return `<li class="trip-events__item">
   <div class="event">
@@ -34,7 +34,7 @@ function createPointTemplate(point) {
       <p class="event__duration">${getPointDuration(point)}</p>
     </div>
     <p class="event__price">
-      &euro;&nbsp;<span class="event__price-value">${basePrice}</span>
+      &euro;&nbsp;<span class="event__price-value">${basePrice ? basePrice : ''}</span>
     </p>
     <h4 class="visually-hidden">Offers:</h4>
     ${createPointOffersTemplate({ offers })}
@@ -54,8 +54,6 @@ function createPointTemplate(point) {
 
 export default class PointView extends AbstractView {
   #point = null;
-  #destination = null;
-  #offers = null;
   #onEditClick = null;
   #onFavoriteClick = null;
 
@@ -63,11 +61,9 @@ export default class PointView extends AbstractView {
     return createPointTemplate(this.#point);
   }
 
-  constructor({ point, destination, offers, onEditClick, onFavoriteClick }) {
+  constructor({ point, onEditClick, onFavoriteClick }) {
     super();
     this.#point = point;
-    this.#destination = destination;
-    this.#offers = offers;
     this.#onEditClick = onEditClick;
     this.#onFavoriteClick = onFavoriteClick;
     this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#editClickHandler);
