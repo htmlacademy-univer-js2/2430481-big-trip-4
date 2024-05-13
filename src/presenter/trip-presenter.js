@@ -11,18 +11,14 @@ import { SORT_TYPE } from '../const.js';
 export default class TripPresenter {
   #tripContainer = null;
   #pointList = null;
-  #destinationsModel = null;
-  #offersModel = null;
   #points = [];
   #pointPresenters = new Map();
   #currentSortType = SORT_TYPE.DAY;
   #sortComponent = null;
 
-  constructor({ tripContainer, destinationsModel, offersModel, pointsModel }) {
+  constructor({ tripContainer, pointsModel }) {
     this.#tripContainer = tripContainer;
     this.#pointList = new PointListView();
-    this.#destinationsModel = destinationsModel;
-    this.#offersModel = offersModel;
     this.#points = [...pointsModel.get()];
     this.#points.sort((a, b) => a.dateFrom - b.dateFrom);
   }

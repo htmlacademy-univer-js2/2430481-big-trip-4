@@ -1,14 +1,20 @@
-import { getRandomInteger, getRandomArrayElement } from '../utils.js';
-import { OFFERS, PRICE } from '../const.js';
+import { OFFERS } from '../const.js';
 
-function generateOffer() {
-  const offer = getRandomArrayElement(OFFERS);
+class Offer {
+  title = null;
+  price = 0;
+  isChecked = false;
+  #id = null;
 
-  return {
-    id: crypto.randomUUID(),
-    title: offer,
-    price: getRandomInteger(PRICE.MIN, (PRICE.MAX / 10))
-  };
+  constructor(title, price) {
+    this.title = title;
+    this.price = price;
+    this.#id = crypto.randomUUID();
+  }
 }
 
-export { generateOffer };
+function generateOffer(type) {
+  return OFFERS.get(type);
+}
+
+export { generateOffer, Offer };

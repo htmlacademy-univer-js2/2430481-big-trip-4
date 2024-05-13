@@ -1,6 +1,7 @@
 import PointView from '../view/point-view';
 import EditPointView from '../view/point-edit-view';
-import { MODE } from '../const';
+import { generateDestination } from '../mock/destination';
+import { MODE, OFFERS } from '../const';
 import { remove, render, replace } from '../framework/render';
 
 export default class PointPresenter {
@@ -32,6 +33,9 @@ export default class PointPresenter {
       point: this.#point,
       onEditPointReset: this.#onEditPointReset,
       onEditPointSubmit: this.#onEditPointSubmit,
+      onEditCheckedPoint: this.#onEditCheckedPoint,
+      onEditInputDestination: this.#onEditInputDestination,
+      onEditTypePoint: this.#onEditTypePoint,
     });
 
     if (!prevPointComponent || !prevEditPointComponent) {
@@ -87,6 +91,10 @@ export default class PointPresenter {
   };
 
   #onEditPointSubmit = () => {
+    if (this.newType) {
+      this.point.type = this.newType;
+      this.newType = null;
+    }
     this.#replaceFormToPoint();
   };
 
@@ -94,6 +102,35 @@ export default class PointPresenter {
     this.#onDataChange({
       ...this.#point,
       isFavorite: !this.#point.isFavorite,
+    });
+  };
+
+  #onEditInputDestination = (currentCity) => {
+    this.#onDataChange({
+      ...this.#point,
+      destination: generateDestination(currentCity)
+    });
+  };
+
+  #onEditCheckedPoint = (offers, checkedOffer) => {
+    const cleanCheckedOffer = checkedOffer.split('-')[2];
+    const number = offers.findIndex((item) => item.title === cleanCheckedOffer);
+    offers[number].isChecked = !offers[number].isChecked;
+    this.#onDataChange({
+      ...this.#point,
+      offers,
+    });
+  };
+
+  #onEditTypePoint = (typePoint) => {
+    const newOffers = OFFERS.get(typePoint).map((item) => {
+      item.isChecked = false;
+      return item;
+    });
+    this.#onDataChange({
+      ...this.#point,
+      type: typePoint,
+      offers: newOffers,
     });
   };
 }

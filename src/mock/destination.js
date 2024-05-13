@@ -1,9 +1,7 @@
-import { getRandomArrayElement, getRandomInteger } from '../utils.js';
-import { CITIES, DESCRIPTION } from '../const.js';
+import { getRandomInteger } from '../utils.js';
+import { DESCRIPTION } from '../const.js';
 
-function generateDestination() {
-  const city = getRandomArrayElement(CITIES);
-
+function generateDestination(city) {
   return {
     id: crypto.randomUUID(),
     description: DESCRIPTION,
