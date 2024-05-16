@@ -1,6 +1,10 @@
-import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
-import { POINT_EMPTY, TYPES, CITIES } from '../const.js';
+import dayjs from 'dayjs';
+import flatpickr from 'flatpickr';
+import 'flatpickr/dist/flatpickr.min.css';
+import AbstractStatefulView from '../framework/view/abstract-stateful-view';
 import { humanizeDate } from '../utils.js';
+import { generateDestination } from '../mock/destination';
+import { OFFERS, CITIES, TYPES, POINT_EMPTY } from '../const';
 
 function createPointCitiesOptionsTemplate() {
   return (
@@ -105,24 +109,25 @@ function createEditPointTemplate(point) {
 }
 
 export default class EditPointView extends AbstractStatefulView {
-  #point = null;
+  #initPointValue = null;
   #onEditPointReset = null;
   #onEditPointSubmit = null;
-  #onEditCheckedPoint = null;
-  #onEditInputDestination = null;
-  #onEditTypePoint = null;
+  #onEditSavePoint = null;
+  #datepickerForStart = null;
+  #datepickerForEnd = null;
 
-  constructor({ point = POINT_EMPTY, onEditPointReset, onEditPointSubmit, onEditCheckedPoint,
-    onEditInputDestination, onEditTypePoint
-  }) {
+  constructor({ point = POINT_EMPTY, onEditPointReset, onEditPointSubmit, onEditSavePoint }) {
     super();
-    this.#point = point;
+    this._setState(point);
+    this.#initPointValue = JSON.parse(JSON.stringify(point));
     this.#onEditPointReset = onEditPointReset;
     this.#onEditPointSubmit = onEditPointSubmit;
-    this.#onEditCheckedPoint = onEditCheckedPoint;
-    this.#onEditInputDestination = onEditInputDestination;
-    this.#onEditTypePoint = onEditTypePoint;
+    this.#onEditSavePoint = onEditSavePoint;
     this._restoreHandlers();
+  }
+
+  get template() {
+    return createEditPointTemplate(this._state);
   }
 
   _restoreHandlers() {
@@ -131,34 +136,113 @@ export default class EditPointView extends AbstractStatefulView {
     this.element.querySelector('.event__available-offers').addEventListener('change', this.#editCheckedPointHandler);
     this.element.querySelector('.event__input--destination').addEventListener('change', this.#editPointInputHandler);
     this.element.querySelector('.event__type-group').addEventListener('change', this.#editTypePointHandler);
+    this.element.querySelector('.event__input--price').addEventListener('change', this.#priceChangeHandler);
+    this.#setFlatpickr();
+  }
+
+  #setFlatpickr() {
+    const commonConfig = {
+      enableTime: true,
+      dateFormat: 'd/m/y H:i',
+      'time_24hr': true,
+      locale: {
+        firstDayOfWeek: 1,
+      }
+    };
+
+    this.#datepickerForStart = flatpickr(
+      this.element.querySelectorAll('.event__input--time')[0],
+      {
+        ...commonConfig,
+        defaultDate: dayjs(this._state.dateFrom).format('DD/MM/YY HH:mm'),
+        onClose: this.#editStartDateChangeHandler,
+      }
+    );
+
+    this.#datepickerForEnd = flatpickr(
+      this.element.querySelectorAll('.event__input--time')[1],
+      {
+        ...commonConfig,
+        defaultDate: dayjs(this._state.dateTo).format('DD/MM/YY HH:mm'),
+        onClose: this.#editEndDateChangeHandler,
+      }
+    );
+  }
+
+  #editStartDateChangeHandler = ([fullStartDate]) => {
+    const startTime = dayjs(fullStartDate).format('YYYY-MM-DDTHH:mm');
+    this._setState({
+      ...this._state,
+      dateFrom: startTime
+    });
+  };
+
+  #editEndDateChangeHandler = ([fullDate]) => {
+    const endTime = dayjs(fullDate).format('YYYY-MM-DDTHH:mm');
+    this._setState({
+      ...this._state,
+      dateTo: endTime
+    });
+  };
+
+  removeElement() {
+    super.removeElement();
+
+    if (this.#datepickerForStart) {
+      this.#datepickerForStart = null;
+    }
+
+    if (this.#datepickerForEnd) {
+      this.#datepickerForEnd = null;
+    }
   }
 
   #editPointResetHandler = (evt) => {
     evt.preventDefault();
-    this.#onEditPointReset();
+    this.#onEditPointReset(this.#initPointValue);
   };
 
   #editPointSubmitHandler = (evt) => {
     evt.preventDefault();
+    this.#onEditSavePoint(this._state);
     this.#onEditPointSubmit();
   };
 
   #editCheckedPointHandler = (evt) => {
     evt.preventDefault();
-    this.#onEditCheckedPoint(this.#point.offers, evt.currentTarget.attributes[0].ownerDocument.activeElement.id);
+    const offers = this._state.offers;
+    const cleanCheckedOffer = evt.currentTarget.attributes[0].ownerDocument.activeElement.id.split('-')[2];
+    const number = offers.findIndex((item) => item.title === cleanCheckedOffer);
+    offers[number].isChecked = !offers[number].isChecked;
+    this._setState({
+      ...this._state,
+      offers,
+    });
   };
 
   #editPointInputHandler = (evt) => {
     evt.preventDefault();
-    this.#onEditInputDestination(evt.currentTarget.value);
+    this.updateElement({
+      destination: generateDestination(evt.currentTarget.value)
+    });
   };
 
   #editTypePointHandler = (evt) => {
     evt.preventDefault();
-    this.#onEditTypePoint(evt.target.value);
+    const typePoint = evt.target.value;
+    const newOffers = OFFERS.get(typePoint).map((item) => {
+      item.isChecked = false;
+      return item;
+    });
+    this.updateElement({
+      type: typePoint,
+      offers: newOffers,
+    });
   };
 
-  get template() {
-    return createEditPointTemplate(this.#point);
-  }
+  #priceChangeHandler = (evt) => {
+    this.updateElement({
+      basePrice: evt.target.value,
+    });
+  };
 }
