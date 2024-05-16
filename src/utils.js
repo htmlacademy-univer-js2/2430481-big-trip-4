@@ -103,12 +103,12 @@ function updateItems(items, update) {
 
 function sortByTime(points) {
   return points.sort((firstPoint, secondPoint) =>
-    dayjs(firstPoint.date.startTime).diff(dayjs(firstPoint.date.endTime), 'minutes') -
-    dayjs(secondPoint.date.startTime).diff(dayjs(secondPoint.date.endTime), 'minutes'));
+    dayjs(firstPoint.dateFrom).diff(dayjs(firstPoint.dateTo), 'minutes') -
+    dayjs(secondPoint.dateFrom).diff(dayjs(secondPoint.dateTo), 'minutes'));
 }
 
 function sortByPrice(points) {
-  return points.sort((firstPoint, secondPoint) => secondPoint.price - firstPoint.price);
+  return points.sort((firstPoint, secondPoint) => secondPoint.basePrice - firstPoint.basePrice);
 }
 
 function sortByDay(points) {
