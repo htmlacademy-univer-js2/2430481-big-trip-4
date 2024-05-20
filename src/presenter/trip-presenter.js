@@ -96,7 +96,7 @@ export default class TripPresenter {
     return filteredPoints;
   }
 
-  #handleViewAction = (actionType, updateType, updatedPoint, mode) => {
+  #handleViewAction = (actionType, updateType, updatedPoint) => {
     switch (actionType) {
       case USER_ACTION.UPDATE_TASK:
         this.#pointsModel.updatePoint(updateType, updatedPoint);
