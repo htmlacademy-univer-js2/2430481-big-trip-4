@@ -8,7 +8,8 @@ const tripContainer = {
   mainElement: siteMainElement,
   tripMain: document.querySelector('.trip-main'),
   eventListElement: siteMainElement.querySelector('.trip-events'),
-  filtersElement: document.querySelector('.trip-controls__filters')
+  filtersElement: document.querySelector('.trip-controls__filters'),
+  newEvtButton: document.querySelector('.trip-main__event-add-btn')
 };
 
 const mockService = new MockService();

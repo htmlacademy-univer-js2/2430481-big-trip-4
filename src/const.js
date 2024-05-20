@@ -21,6 +21,21 @@ const PRICE = {
   MAX: 1000
 };
 
+const TIME_PERIODS = {
+  MSEC_IN_SEC: 1000,
+  SEC_IN_MIN: 60,
+  MIN_IN_HOUR: 60,
+  HOUR_IN_DAY: 24,
+  MSEC_IN_HOUR: (60 * 60 * 1000),
+  MSEC_IN_DAY: 24 * (60 * 60 * 1000)
+};
+
+const DURATION = {
+  HOUR: 5,
+  DAY: 5,
+  MIN: 59
+};
+
 const QUANTITIES = {
   offersCount: 5,
   destinationsCount: 5,
@@ -40,9 +55,22 @@ const POINT_EMPTY = {
 const MODE = {
   DEFAULT: 'DEFAULT',
   EDITING: 'EDITING',
+  CREATIING: 'CREATING'
 };
 
-const SORT_TYPE = {
+const USER_ACTION = {
+  UPDATE_TASK: 'UPDATE_TASK',
+  ADD_TASK: 'ADD_TASK',
+  DELETE_TASK: 'DELETE_TASK',
+};
+
+const UPDATE_TYPES = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR',
+};
+
+const SORT_TYPES = {
   DAY: 'day',
   EVENT: 'event',
   TIME: 'time',
@@ -50,4 +78,21 @@ const SORT_TYPE = {
   OFFERS: 'offers'
 };
 
-export { CITIES, POINT_TYPES as TYPES, DESCRIPTION, PRICE, POINT_EMPTY, QUANTITIES, MODE, SORT_TYPE, OFFERS };
+const FILTER_TYPES = {
+  EVERYTHING: 'everything',
+  FUTURE: 'future',
+  PRESENT: 'present',
+  PAST: 'past',
+};
+
+const FILTER_MESSAGES = {
+  'everything': 'Click New Event to create your first point',
+  'future': 'There are no future events now',
+  'present': 'There are no present events now',
+  'past': 'There are no past events now',
+};
+
+export {
+  CITIES, POINT_TYPES, DESCRIPTION, PRICE, POINT_EMPTY, QUANTITIES, MODE, SORT_TYPES, OFFERS,
+  FILTER_TYPES, DURATION, TIME_PERIODS, UPDATE_TYPES, USER_ACTION, FILTER_MESSAGES
+};

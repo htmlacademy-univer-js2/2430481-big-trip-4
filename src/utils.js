@@ -1,34 +1,19 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import { TIME_PERIODS, DURATION, FILTER_TYPES } from './const';
 
 dayjs.extend(duration);
 dayjs.extend(relativeTime);
 
-const TimePeriods = {
-  MSEC_IN_SEC: 1000,
-  SEC_IN_MIN: 60,
-  MIN_IN_HOUR: 60,
-  HOUR_IN_DAY: 24,
-  MSEC_IN_HOUR: (60 * 60 * 1000),
-  MSEC_IN_DAY: 24 * (60 * 60 * 1000)
-};
-
-const Duration = {
-  HOUR: 5,
-  DAY: 5,
-  MIN: 59
-};
-
-
 function getRandomDate() {
-  return dayjs().add(getRandomInteger(0, Duration.DAY), 'day').toDate();
+  return dayjs().add(getRandomInteger(0, DURATION.DAY), 'day').toDate();
 }
 
 function addRandomTimespan(date) {
-  const minsGap = getRandomInteger(0, Duration.MIN);
-  const hoursGap = getRandomInteger(1, Duration.HOUR);
-  const daysGap = getRandomInteger(0, Duration.DAY);
+  const minsGap = getRandomInteger(0, DURATION.MIN);
+  const hoursGap = getRandomInteger(1, DURATION.HOUR);
+  const daysGap = getRandomInteger(0, DURATION.DAY);
   date = dayjs(date)
     .add(minsGap, 'minute')
     .add(hoursGap, 'hour')
@@ -58,13 +43,13 @@ function getPointDuration(point) {
   let pointDuration = 0;
 
   switch (true) {
-    case (timeDiff >= TimePeriods.MSEC_IN_DAY):
+    case (timeDiff >= TIME_PERIODS.MSEC_IN_DAY):
       pointDuration = dayjs.duration(timeDiff).format('DD[D] HH[H] mm[M]');
       break;
-    case (timeDiff >= TimePeriods.MSEC_IN_HOUR):
+    case (timeDiff >= TIME_PERIODS.MSEC_IN_HOUR):
       pointDuration = dayjs.duration(timeDiff).format('HH[H] mm[M]');
       break;
-    case (timeDiff < TimePeriods.MSEC_IN_HOUR):
+    case (timeDiff < TIME_PERIODS.MSEC_IN_HOUR):
       pointDuration = dayjs.duration(timeDiff).format('mm[M]');
       break;
   }
@@ -73,6 +58,9 @@ function getPointDuration(point) {
 }
 
 function getTripTitle(cities) {
+  if (cities.length > 3) {
+    return `${cities[0]} &mdash; ... &mdash; ${cities[cities.length - 1]}`;
+  }
   return cities.reduce((acc, city, index) => {
     if (index !== cities.length - 1) {
       acc += `${city} &mdash; `;
@@ -115,6 +103,31 @@ function sortByDay(points) {
   return points.sort((firstPoint, secondPoint) => new Date(firstPoint.dateFrom) - new Date(secondPoint.dateFrom));
 }
 
+function isFuture(dateFrom) {
+  const formatedDate = dayjs(dateFrom).format('YYYY/MM/DD');
+  const currentDate = dayjs().format('YYYY/MM/DD');
+  return dayjs(formatedDate).isAfter(currentDate);
+}
+
+function isPresent(dateFrom) {
+  const formatedDate = dayjs(dateFrom).format('YYYY/MM/DD');
+  const currentDate = dayjs().format('YYYY/MM/DD');
+  return dayjs(formatedDate).isSame(currentDate);
+}
+
+function isPast(dateFrom) {
+  const formatedDate = dayjs(dateFrom).format('YYYY/MM/DD');
+  const currentDate = dayjs().format('YYYY/MM/DD');
+  return dayjs(formatedDate).isBefore(currentDate);
+}
+
+const filter = {
+  [FILTER_TYPES.EVERYTHING]: (points) => points,
+  [FILTER_TYPES.FUTURE]: (points) => points.filter((point) => isFuture(point.dateFrom)),
+  [FILTER_TYPES.PRESENT]: (points) => points.filter((point) => isPresent(point.dateFrom)),
+  [FILTER_TYPES.PAST]: (points) => points.filter((point) => isPast(point.dateFrom)),
+};
+
 export {
   getRandomArrayElement,
   getRandomInteger,
@@ -128,5 +141,6 @@ export {
   updateItems,
   sortByDay,
   sortByPrice,
-  sortByTime
+  sortByTime,
+  filter
 };
