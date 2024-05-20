@@ -13,4 +13,12 @@ function generateDestination(city) {
   };
 }
 
-export { generateDestination };
+function getDefaultDestination() {
+  return {
+    id: null,
+    description: '',
+    img: null,
+  };
+}
+
+export { generateDestination, getDefaultDestination };
