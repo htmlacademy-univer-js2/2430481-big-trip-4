@@ -1,29 +1,32 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import { humanizeDate, getPointDuration } from '../utils.js';
+import { humanizeDate, getPointDuration } from '../utils/point-utils.js';
 
-function createPointOffersTemplate(offers) {
-  const offersList = offers.offers.reduce((acc, { title, price, isChecked }) => (acc += isChecked ?
-    `<li class="event__offer">
+function createPointOffersTemplate({ offers, currentOffers }) {
+  const offersStr = currentOffers.reduce((acc, { id, title, price }) => (
+    acc += offers.includes(id) ?
+      `<li class="event__offer">
         <span class="event__offer-title">${title}</span>
-        &plus;&euro;&nbsp;
+          &plus;&euro;&nbsp;
         <span class="event__offer-price">${price}</span>
-    </li>` : ''), '');
+      </li>` : ''), '');
   return (
     `<ul class="event__selected-offers">
-        ${offersList}
-      </ul>`
+      ${offersStr}
+    </ul>`
   );
 }
 
-function createPointTemplate(point) {
+function createPointTemplate(point, allOffers, allDestinations) {
   const { basePrice, dateFrom, dateTo, destination, isFavorite, type, offers } = point;
+  const currentOffers = allOffers.find((obj) => obj.type === type).offers;
+  const currentDestination = allDestinations.find((destintn) => destintn.id === destination);
   return `<li class="trip-events__item">
   <div class="event">
     <time class="event__date" datetime=${humanizeDate('DD/MM/YY HH:mm', dateFrom)}>${humanizeDate('MMM DD', dateFrom)}</time>
     <div class="event__type">
       <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
     </div>
-    <h3 class="event__title">${type} ${destination.name}</h3>
+    <h3 class="event__title">${type} ${currentDestination.name}</h3>
     <div class="event__schedule">
       <p class="event__time">
         <time class="event__start-time" datetime=${humanizeDate('DD/MM/YY HH:mm', dateFrom)}>${humanizeDate('HH:mm', dateFrom)}</time>
@@ -36,7 +39,7 @@ function createPointTemplate(point) {
       &euro;&nbsp;<span class="event__price-value">${basePrice ? basePrice : ''}</span>
     </p>
     <h4 class="visually-hidden">Offers:</h4>
-    ${createPointOffersTemplate({ offers })}
+    ${createPointOffersTemplate({ offers, currentOffers })}
     <button class="event__favorite-btn ${isFavorite ? 'event__favorite-btn--active' : ''}" type="button">
       <span class="visually-hidden">Add to favorite</span>
       <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
@@ -52,16 +55,20 @@ function createPointTemplate(point) {
 
 export default class PointView extends AbstractView {
   #point = null;
+  #offers = [];
+  #destinations = [];
   #onEditClick = null;
   #onFavoriteClick = null;
 
   get template() {
-    return createPointTemplate(this.#point);
+    return createPointTemplate(this.#point, this.#offers, this.#destinations);
   }
 
-  constructor({ point, onEditClick, onFavoriteClick }) {
+  constructor({ point, allOffers, allDestinations, onEditClick, onFavoriteClick }) {
     super();
     this.#point = point;
+    this.#offers = allOffers;
+    this.#destinations = allDestinations;
     this.#onEditClick = onEditClick;
     this.#onFavoriteClick = onFavoriteClick;
     this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#editClickHandler);

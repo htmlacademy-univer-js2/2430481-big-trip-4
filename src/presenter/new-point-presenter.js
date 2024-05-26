@@ -1,21 +1,20 @@
 import EditPointView from '../view/point-edit-view';
 import { RenderPosition, remove, render } from '../framework/render';
-import { USER_ACTION, UPDATE_TYPES } from '../const';
+import { MODE, USER_ACTION, UPDATE_TYPES } from '../const';
 
 export default class NewPointPresenter {
+  #mode = MODE.CREATING;
   #pointsListContainer = null;
   #editPointComponent = null;
   #handleDataChange = null;
   #resetModeHandler = null;
   #newEventBtn = null;
-  #mode = null;
 
-  constructor({ pointsListContainer, onDataChange, onResetMode, newEventBtn, mode }) {
+  constructor({ pointsListContainer, onDataChange, onResetMode, newEventBtn }) {
     this.#pointsListContainer = pointsListContainer;
     this.#handleDataChange = onDataChange;
     this.#resetModeHandler = onResetMode;
     this.#newEventBtn = newEventBtn;
-    this.#mode = mode;
   }
 
   init() {
