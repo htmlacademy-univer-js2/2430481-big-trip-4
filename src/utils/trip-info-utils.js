@@ -28,4 +28,17 @@ function getTripTitle(cities) {
   }, '');
 }
 
-export { getTripStartDate, getTripEndDate, getTripTitle };
+function calculateOffersPrice(points, allOffers) {
+  let total = 0;
+  for (let i = 0; i < points.length; i++) {
+    const offers = allOffers.find((offer) => offer.type === points[i].type).offers;
+    offers.forEach((offer) => {
+      if (points[i].offers.includes(offer.id)) {
+        total += offer.price;
+      }
+    });
+  }
+  return total;
+}
+
+export { getTripStartDate, getTripEndDate, getTripTitle, calculateOffersPrice };
