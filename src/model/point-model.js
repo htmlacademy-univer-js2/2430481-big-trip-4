@@ -3,50 +3,32 @@ import { UPDATE_TYPES } from '../const';
 
 export default class PointModel extends Observable {
   #points = null;
-  #destinations = [];
-  #offers = [];
   #service = null;
+  #offerModel = null;
+  #destinationModel = null;
 
-  constructor(service) {
+  constructor(service, destinationModel, offerModel) {
     super();
     this.#service = service;
+    this.#destinationModel = destinationModel;
+    this.#offerModel = offerModel;
   }
 
   get points() {
     return this.#points;
   }
 
-  get destinations() {
-    return this.#destinations;
-  }
-
-  get offers() {
-    return this.#offers;
-  }
-
   async init() {
     try {
       const points = await this.#service.points;
+      await Promise.all([
+        this.#destinationModel.init(),
+        this.#offerModel.init()
+      ]);
       this.#points = points.map(this.#adaptToClient);
-      window.console.log(this.#points);
-    } catch (err) {
+    } catch (error) {
       this.#points = [];
     }
-
-    try {
-      this.#destinations = await this.#service.destinations;
-      window.console.log(this.#destinations);
-    } catch (err) {
-      this.#destinations = [];
-    }
-
-    try {
-      this.#offers = await this.#service.offers;
-      window.console.log(this.#offers);
-    } catch (err) {
-      this.#offers = [];
-    }
-
     this._notify(UPDATE_TYPES.INIT);
   }
 

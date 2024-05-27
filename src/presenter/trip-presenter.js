@@ -21,6 +21,8 @@ export default class TripPresenter {
   #currentSortType = SORT_TYPES.DAY;
   #sortComponent = null;
   #mode = MODE.DEFAULT;
+  #offerModel = null;
+  #destinationModel = null;
   #filterModel = new FilterModel();
   #filterPresenter = null;
   #newPointPresenter = null;
@@ -34,10 +36,12 @@ export default class TripPresenter {
     upperLimit: TIME_LIMIT.UPPER_LIMIT
   });
 
-  constructor({ tripContainer, pointModel }) {
+  constructor({ tripContainer, pointModel, offerModel, destinationModel }) {
     this.#tripContainer = tripContainer;
     this.#pointList = new PointListView();
     this.#pointModel = pointModel;
+    this.#destinationModel = destinationModel;
+    this.#offerModel = offerModel;
     this.#newEvtButton = this.#tripContainer.newEvtButton;
     this.#pointModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);
@@ -117,6 +121,7 @@ export default class TripPresenter {
         this.#newPointPresenter.setSaving();
         try {
           await this.#pointModel.addPoint(updateType, updatedPoint);
+          this.#newPointPresenter.destroy();
         } catch {
           this.#newPointPresenter.setAborting();
         } break;
@@ -149,7 +154,7 @@ export default class TripPresenter {
     }
 
     if (this.points.length !== 0) {
-      this.#tripInfoComponent = new TripInfoView(this.points, this.destinations);
+      this.#tripInfoComponent = new TripInfoView(this.points, this.destinations, this.offers);
       render(this.#tripInfoComponent, this.#tripContainer.tripMain, RenderPosition.AFTERBEGIN);
       this.#renderSort();
       render(this.#pointList, this.#tripContainer.eventListElement);
@@ -226,10 +231,10 @@ export default class TripPresenter {
   }
 
   get destinations() {
-    return this.#pointModel.destinations;
+    return this.#destinationModel.destinations;
   }
 
   get offers() {
-    return this.#pointModel.offers;
+    return this.#offerModel.offers;
   }
 }

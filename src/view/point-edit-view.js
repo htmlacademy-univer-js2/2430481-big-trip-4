@@ -171,7 +171,7 @@ export default class EditPointView extends AbstractStatefulView {
 
   constructor({ point = getDefaultPoint(), allOffers, allDestinations, onEditPointReset, onEditPointSave, onEditDeletePoint, mode = MODE.EDITING }) {
     super();
-    this._setState(this.parsePointToState(point));
+    this._setState(this.#parsePointToState(point));
     this.#oldState = JSON.parse(JSON.stringify(point));
     this.#handleEditPointReset = onEditPointReset;
     this.#handleEditPointSave = onEditPointSave;
@@ -202,7 +202,7 @@ export default class EditPointView extends AbstractStatefulView {
     this.#setFlatpickr();
   }
 
-  parsePointToState(point) {
+  #parsePointToState(point) {
     return {
       ...point,
       isDisabled: false,
@@ -211,7 +211,7 @@ export default class EditPointView extends AbstractStatefulView {
     };
   }
 
-  parseStateToPoint(state) {
+  #parseStateToPoint(state) {
     const point = { ...state };
 
     delete point.isDisabled;
@@ -293,12 +293,12 @@ export default class EditPointView extends AbstractStatefulView {
 
   #editPointSaveHandler = (evt) => {
     evt.preventDefault();
-    this.#handleEditPointSave(this.parseStateToPoint(this._state));
+    this.#handleEditPointSave(this.#parseStateToPoint(this._state));
   };
 
   #editDeletePointHandler = (evt) => {
     evt.preventDefault();
-    this.#handleEditDeletePoint(this.parseStateToPoint(this._state));
+    this.#handleEditDeletePoint(this.#parseStateToPoint(this._state));
   };
 
   #editPointResetHandler = (evt) => {

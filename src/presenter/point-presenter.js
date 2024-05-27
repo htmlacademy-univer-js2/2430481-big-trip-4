@@ -141,8 +141,8 @@ export default class PointPresenter {
   };
 
   #handleEditPointReset = () => {
-    this.#replaceFormToPoint();
     this.#handleEditPointSave(this.#oldPoint);
+    this.#replaceFormToPoint();
   };
 
   #handleEditPointSave = (updatedPoint) => {

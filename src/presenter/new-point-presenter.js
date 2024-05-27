@@ -76,7 +76,6 @@ export default class NewPointPresenter {
       UPDATE_TYPES.MAJOR,
       updatedPoint
     );
-    this.destroy();
   };
 
   #handleEditCancelPoint = () => {
