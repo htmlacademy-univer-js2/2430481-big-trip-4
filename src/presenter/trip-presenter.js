@@ -1,17 +1,17 @@
 import SortView from '../view/sort-view.js';
 import PointListView from '../view/point-list-view.js';
 import LoadingView from '../view/loading-view';
-// import FilterView from '../view/filter-view.js';
 import EmptyListView from '../view/empty-list-view.js';
 import TripInfoView from '../view/trip-info-view.js';
 import PointPresenter from './point-presenter';
 import FilterPresenter from './filter-presenter';
 import NewPointPresenter from './new-point-presenter';
 import FilterModel from '../model/filter-model';
+import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 import { sortByDay, sortByTime, sortByPrice } from '../utils/sort-utils';
 import { FILTER } from '../utils/filter-utils';
 import { render, RenderPosition, remove } from '../framework/render.js';
-import { SORT_TYPES, MODE, USER_ACTION, UPDATE_TYPES, FILTER_TYPES } from '../const.js';
+import { SORT_TYPES, MODE, USER_ACTION, UPDATE_TYPES, FILTER_TYPES, TIME_LIMIT } from '../const.js';
 
 export default class TripPresenter {
   #tripContainer = null;
@@ -29,6 +29,10 @@ export default class TripPresenter {
   #loadingComponent = new LoadingView();
   #isLoading = true;
   #newEvtButton = null;
+  #uiBlocker = new UiBlocker({
+    lowerLimit: TIME_LIMIT.LOWER_LIMIT,
+    upperLimit: TIME_LIMIT.UPPER_LIMIT
+  });
 
   constructor({ tripContainer, pointModel }) {
     this.#tripContainer = tripContainer;
@@ -79,7 +83,7 @@ export default class TripPresenter {
       newEventBtn: this.#newEvtButton,
       mode: this.#mode
     });
-    this.#newPointPresenter.init();
+    this.#newPointPresenter.init(this.offers, this.destinations);
     this.#pointPresenters.forEach((presenter) => presenter.resetView());
   }
 
@@ -99,17 +103,33 @@ export default class TripPresenter {
     return filteredPoints;
   }
 
-  #handleViewAction = (actionType, updateType, updatedPoint) => {
+  #handleViewAction = async (actionType, updateType, updatedPoint) => {
+    this.#uiBlocker.block();
     switch (actionType) {
       case USER_ACTION.UPDATE_TASK:
-        this.#pointModel.updatePoint(updateType, updatedPoint);
-        break;
+        this.#pointPresenters.get(updatedPoint.id).setSaving();
+        try {
+          await this.#pointModel.updatePoint(updateType, updatedPoint);
+        } catch {
+          this.#pointPresenters.get(updatedPoint.id).setAborting();
+        } break;
       case USER_ACTION.ADD_TASK:
-        this.#pointModel.addPoint(updateType, updatedPoint);
-        break;
+        this.#newPointPresenter.setSaving();
+        try {
+          await this.#pointModel.addPoint(updateType, updatedPoint);
+        } catch {
+          this.#newPointPresenter.setAborting();
+        } break;
       case USER_ACTION.DELETE_TASK:
-        this.#pointModel.deletePoint(updateType, updatedPoint);
+        this.#pointPresenters.get(updatedPoint.id).setDeleting();
+        try {
+          await this.#pointModel.deletePoint(updateType, updatedPoint);
+        } catch {
+          this.#pointPresenters.get(updatedPoint.id).setAborting();
+        }
+        break;
     }
+    this.#uiBlocker.unblock();
   };
 
   #renderBoard() {
