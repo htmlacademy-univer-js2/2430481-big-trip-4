@@ -10,8 +10,7 @@ const TIME_PERIODS = {
 };
 
 const POINT_EMPTY = {
-  id: null,
-  type: null,
+  type: 'taxi',
   basePrice: null,
   dateFrom: null,
   dateTo: null,
@@ -68,7 +67,12 @@ const REQUEST_METHOD = {
   DELETE: 'DELETE'
 };
 
+const TIME_LIMIT = {
+  LOWER_LIMIT: 350,
+  UPPER_LIMIT: 1000,
+};
+
 export {
   POINT_TYPES, POINT_EMPTY, MODE, SORT_TYPES, FILTER_TYPES, TIME_PERIODS,
-  UPDATE_TYPES, USER_ACTION, FILTER_MESSAGES, REQUEST_METHOD
+  UPDATE_TYPES, USER_ACTION, FILTER_MESSAGES, REQUEST_METHOD, TIME_LIMIT
 };

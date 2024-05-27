@@ -6,6 +6,7 @@ import dayjs from 'dayjs';
 
 export default class PointPresenter {
   #point = null;
+  #oldPoint = null;
   #allOffers = [];
   #allDestinations = [];
   #pointComponent = null;
@@ -23,6 +24,7 @@ export default class PointPresenter {
 
   init(point, allOffers, allDestinations) {
     this.#point = point;
+    this.#oldPoint = JSON.parse(JSON.stringify(point));
     this.#allOffers = allOffers;
     this.#allDestinations = allDestinations;
     const prevPointComponent = this.#pointComponent;
@@ -64,6 +66,42 @@ export default class PointPresenter {
     remove(this.#editPointComponent);
   };
 
+  setSaving() {
+    if (this.#mode === MODE.EDITING) {
+      this.#editPointComponent.updateElement({
+        isDisabled: true,
+        isSaving: true,
+      });
+    }
+  }
+
+  setDeleting() {
+    if (this.#mode === MODE.EDITING) {
+      this.#editPointComponent.updateElement({
+        isDisabled: true,
+        isDeleting: true,
+      });
+    }
+  }
+
+  setAborting() {
+    if (this.#mode === MODE.DEFAULT) {
+      this.#pointComponent.shake();
+      return;
+    }
+
+    const resetFormState = () => {
+      this.#editPointComponent.updateElement({
+        ...this.#oldPoint,
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    this.#editPointComponent.shake(resetFormState);
+  }
+
   resetView = () => {
     if (this.#mode !== MODE.DEFAULT) {
       this.#replaceFormToPoint();
@@ -102,9 +140,9 @@ export default class PointPresenter {
     );
   };
 
-  #handleEditPointReset = (oldPoint) => {
+  #handleEditPointReset = () => {
     this.#replaceFormToPoint();
-    this.#handleEditPointSave(oldPoint);
+    this.#handleEditPointSave(this.#oldPoint);
   };
 
   #handleEditPointSave = (updatedPoint) => {
