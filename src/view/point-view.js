@@ -1,5 +1,5 @@
-import AbstractView from '../framework/view/abstract-view.js';
-import { humanizeDate, getPointDuration } from '../utils/point-utils.js';
+import AbstractView from '../framework/view/abstract-view';
+import { humanizeDate, getPointDuration } from '../utils/point-utils';
 
 function createPointOffersTemplate({ offers, currentOffers }) {
   const offersStr = currentOffers.reduce((acc, { id, title, price }) => (
@@ -71,16 +71,16 @@ export default class PointView extends AbstractView {
     this.#destinations = allDestinations;
     this.#onEditClick = onEditClick;
     this.#onFavoriteClick = onFavoriteClick;
-    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#editClickHandler);
-    this.element.querySelector('.event__favorite-btn').addEventListener('click', this.#favoriteClickHandler);
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#onPointEditClick);
+    this.element.querySelector('.event__favorite-btn').addEventListener('click', this.#onPointFavoriteClick);
   }
 
-  #editClickHandler = (evt) => {
+  #onPointEditClick = (evt) => {
     evt.preventDefault();
     this.#onEditClick();
   };
 
-  #favoriteClickHandler = (evt) => {
+  #onPointFavoriteClick = (evt) => {
     evt.preventDefault();
     this.#onFavoriteClick();
   };

@@ -8,19 +8,19 @@ const siteMainElement = document.querySelector('.page-main');
 
 const tripContainer = {
   mainElement: siteMainElement,
-  tripMain: document.querySelector('.trip-main'),
+  tripMainElement: document.querySelector('.trip-main'),
   eventListElement: siteMainElement.querySelector('.trip-events'),
   filtersElement: document.querySelector('.trip-controls__filters'),
-  newEvtButton: document.querySelector('.trip-main__event-add-btn')
+  newEvtButtonElement: document.querySelector('.trip-main__event-add-btn')
 };
 
-const pointsApiService = new PointsApiService('https://21.objects.htmlacademy.pro/big-trip', 'Basic privetgleb');
+const pointsApiService = new PointsApiService('https://21.objects.htmlacademy.pro/big-trip', 'Basic privetgleb1');
 const offerModel = new OfferModel(pointsApiService);
 const destinationModel = new DestinationModel(pointsApiService);
 const pointModel = new PointModel(pointsApiService, destinationModel, offerModel);
 
 const tripPresenter = new TripPresenter({ tripContainer, pointModel, offerModel, destinationModel });
 pointModel.init().finally(() => {
-  tripContainer.newEvtButton.style.visibility = 'visible';
+  tripContainer.newEvtButtonElement.style.visibility = 'visible';
 });
 tripPresenter.init();
