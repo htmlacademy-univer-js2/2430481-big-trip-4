@@ -1,25 +1,25 @@
 import PointView from '../view/point-view';
 import EditPointView from '../view/point-edit-view';
 import { remove, render, replace } from '../framework/render';
-import { USER_ACTION, UPDATE_TYPES, MODE } from '../const';
+import { USER_ACTIONS, UPDATE_TYPES, MODE } from '../const';
 import dayjs from 'dayjs';
 
 export default class PointPresenter {
-  #point = null;
-  #oldPoint = null;
+  #mode = MODE.DEFAULT;
   #allOffers = [];
   #allDestinations = [];
+  #point = null;
+  #oldPoint = null;
   #pointComponent = null;
   #editPointComponent = null;
   #pointsListContainer = null;
-  #handleDataChange = null;
-  #handleModeChange = null;
-  #mode = MODE.DEFAULT;
+  #onDataChange = null;
+  #onModeChange = null;
 
   constructor({ pointsListContainer, onDataChange, onModeChange }) {
     this.#pointsListContainer = pointsListContainer;
-    this.#handleDataChange = onDataChange;
-    this.#handleModeChange = onModeChange;
+    this.#onDataChange = onDataChange;
+    this.#onModeChange = onModeChange;
   }
 
   init(point, allOffers, allDestinations) {
@@ -27,14 +27,14 @@ export default class PointPresenter {
     this.#oldPoint = JSON.parse(JSON.stringify(point));
     this.#allOffers = allOffers;
     this.#allDestinations = allDestinations;
-    const prevPointComponent = this.#pointComponent;
-    const prevEditPointComponent = this.#editPointComponent;
+    const previousPointComponent = this.#pointComponent;
+    const previousEditPointComponent = this.#editPointComponent;
 
     this.#pointComponent = new PointView({
       point: this.#point,
       allOffers: this.#allOffers,
       allDestinations: this.#allDestinations,
-      onEditClick: this.#handleEditClick,
+      onEditClick: this.#onEditClick,
       onFavoriteClick: this.#handleFavoriteClick,
     });
 
@@ -42,28 +42,34 @@ export default class PointPresenter {
       point: this.#point,
       allOffers: this.#allOffers,
       allDestinations: this.#allDestinations,
-      onEditPointReset: this.#handleEditPointReset,
-      onEditPointSave: this.#handleEditPointSave,
-      onEditDeletePoint: this.#handleEditDeletePoint,
+      onEditPointReset: this.#onEditPointReset,
+      onEditPointSave: this.#onEditPointSave,
+      onEditPointDelete: this.#onEditPointDelete,
     });
 
-    if (!prevPointComponent || !prevEditPointComponent) {
+    if (!previousPointComponent || !previousEditPointComponent) {
       render(this.#pointComponent, this.#pointsListContainer);
       return;
     }
     if (this.#mode === MODE.DEFAULT) {
-      replace(this.#pointComponent, prevPointComponent);
+      replace(this.#pointComponent, previousPointComponent);
     }
     if (this.#mode === MODE.EDITING) {
-      replace(this.#editPointComponent, prevEditPointComponent);
+      replace(this.#editPointComponent, previousEditPointComponent);
     }
-    remove(prevPointComponent);
-    remove(prevEditPointComponent);
+    remove(previousPointComponent);
+    remove(previousEditPointComponent);
   }
 
   destroy = () => {
     remove(this.#pointComponent);
     remove(this.#editPointComponent);
+  };
+
+  resetView = () => {
+    if (this.#mode !== MODE.DEFAULT) {
+      this.#replaceFormToPoint();
+    }
   };
 
   setSaving() {
@@ -75,6 +81,22 @@ export default class PointPresenter {
     }
   }
 
+  setAborting() {
+    if (this.#mode === MODE.DEFAULT) {
+      this.#pointComponent.shake();
+      return;
+    }
+    const resetFormState = () => {
+      this.#editPointComponent.updateElement({
+        ...this.#oldPoint,
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+    this.#editPointComponent.shake(resetFormState);
+  }
+
   setDeleting() {
     if (this.#mode === MODE.EDITING) {
       this.#editPointComponent.updateElement({
@@ -84,82 +106,58 @@ export default class PointPresenter {
     }
   }
 
-  setAborting() {
-    if (this.#mode === MODE.DEFAULT) {
-      this.#pointComponent.shake();
-      return;
-    }
+  #onEditClick = () => {
+    this.#replacePointToForm();
+  };
 
-    const resetFormState = () => {
-      this.#editPointComponent.updateElement({
-        ...this.#oldPoint,
-        isDisabled: false,
-        isSaving: false,
-        isDeleting: false,
-      });
-    };
-
-    this.#editPointComponent.shake(resetFormState);
-  }
-
-  resetView = () => {
-    if (this.#mode !== MODE.DEFAULT) {
-      this.#replaceFormToPoint();
-    }
+  #handleFavoriteClick = () => {
+    this.#onDataChange(
+      USER_ACTIONS.UPDATE_TASK,
+      UPDATE_TYPES.PATCH,
+      { ...this.#point, isFavorite: !this.#point.isFavorite }
+    );
   };
 
   #replacePointToForm = () => {
     replace(this.#editPointComponent, this.#pointComponent);
-    document.addEventListener('keydown', this.#escKeydown);
-    this.#handleModeChange();
+    document.addEventListener('keydown', this.#onEscapeKeydown);
+    this.#onModeChange();
     this.#mode = MODE.EDITING;
   };
 
   #replaceFormToPoint = () => {
     replace(this.#pointComponent, this.#editPointComponent);
-    document.removeEventListener('keydown', this.#escKeydown);
+    document.removeEventListener('keydown', this.#onEscapeKeydown);
     this.#mode = MODE.DEFAULT;
   };
 
-  #escKeydown = (evt) => {
+  #onEscapeKeydown = (evt) => {
     if (evt.key === 'Esc' || evt.key === 'Escape') {
       evt.preventDefault();
       this.#replaceFormToPoint();
     }
   };
 
-  #handleEditClick = () => {
-    this.#replacePointToForm();
-  };
-
-  #handleFavoriteClick = () => {
-    this.#handleDataChange(
-      USER_ACTION.UPDATE_TASK,
-      UPDATE_TYPES.PATCH,
-      { ...this.#point, isFavorite: !this.#point.isFavorite }
-    );
-  };
-
-  #handleEditPointReset = () => {
-    this.#handleEditPointSave(this.#oldPoint);
-    this.#replaceFormToPoint();
-  };
-
-  #handleEditPointSave = (updatedPoint) => {
+  #onEditPointSave = (updatedPoint) => {
     const isMinorUpdate = dayjs(updatedPoint.dateFrom).isSame(this.#point.dateFrom)
       || dayjs(updatedPoint.dateTo).isSame(this.#point.dateTo)
       || updatedPoint.price === this.#point.price;
 
-    this.#handleDataChange(
-      USER_ACTION.UPDATE_TASK,
+    this.#onDataChange(
+      USER_ACTIONS.UPDATE_TASK,
       isMinorUpdate ? UPDATE_TYPES.MINOR : UPDATE_TYPES.PATCH,
       updatedPoint,
     );
   };
 
-  #handleEditDeletePoint = (updatedPoint) => {
-    this.#handleDataChange(
-      USER_ACTION.DELETE_TASK,
+  #onEditPointReset = () => {
+    this.#editPointComponent.reset(this.#oldPoint);
+    this.#replaceFormToPoint();
+  };
+
+  #onEditPointDelete = (updatedPoint) => {
+    this.#onDataChange(
+      USER_ACTIONS.DELETE_TASK,
       UPDATE_TYPES.MINOR,
       updatedPoint,
     );

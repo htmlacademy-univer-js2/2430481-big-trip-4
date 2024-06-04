@@ -10,8 +10,8 @@ const TIME_PERIODS = {
 };
 
 const POINT_EMPTY = {
-  type: 'taxi',
-  basePrice: null,
+  type: 'flight',
+  basePrice: 0,
   dateFrom: null,
   dateTo: null,
   destination: null,
@@ -25,7 +25,7 @@ const MODE = {
   CREATING: 'CREATING'
 };
 
-const USER_ACTION = {
+const USER_ACTIONS = {
   UPDATE_TASK: 'UPDATE_TASK',
   ADD_TASK: 'ADD_TASK',
   DELETE_TASK: 'DELETE_TASK',
@@ -60,19 +60,19 @@ const FILTER_MESSAGES = {
   'past': 'There are no past events now',
 };
 
-const REQUEST_METHOD = {
+const REQUEST_METHODS = {
   GET: 'GET',
   PUT: 'PUT',
   POST: 'POST',
   DELETE: 'DELETE'
 };
 
-const TIME_LIMIT = {
+const TIME_LIMITS = {
   LOWER_LIMIT: 350,
   UPPER_LIMIT: 1000,
 };
 
 export {
   POINT_TYPES, POINT_EMPTY, MODE, SORT_TYPES, FILTER_TYPES, TIME_PERIODS,
-  UPDATE_TYPES, USER_ACTION, FILTER_MESSAGES, REQUEST_METHOD, TIME_LIMIT
+  UPDATE_TYPES, USER_ACTIONS, FILTER_MESSAGES, REQUEST_METHODS, TIME_LIMITS
 };

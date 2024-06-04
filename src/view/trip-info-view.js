@@ -1,10 +1,8 @@
-import AbstractView from '../framework/view/abstract-view.js';
-import { getTripTitle, getTripStartDate, getTripEndDate, calculateOffersPrice } from '../utils/trip-info-utils.js';
+import AbstractView from '../framework/view/abstract-view';
+import { getTripTitle, getTripStartDate, getTripEndDate, calculateOffersPrice } from '../utils/trip-info-utils';
 
 function createTripInfoTemplate(points, destinations, offers) {
-  const totalBasePrice = points.reduce((acc, point) => acc + point.basePrice, 0);
-  const totalOfferPrice = calculateOffersPrice(points, offers);
-  const totalPrice = totalBasePrice + totalOfferPrice;
+  const totalPrice = points.reduce((acc, point) => acc + point.basePrice, 0) + calculateOffersPrice(points, offers);
   const sortedPoints = points.sort((a, b) => a.dateFrom - b.dateFrom);
   const cities = sortedPoints.map((point) => destinations.find((destination) => destination.id === point.destination).name);
   const tripTitle = getTripTitle(cities);
